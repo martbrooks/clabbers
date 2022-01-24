@@ -20,20 +20,20 @@
 use strict;
 use DBI;
 
-$|=1;
+$| = 1;
 
-my $database="DBI:Pg:dbname=sowpods";
-my $dbh = DBI->connect("$database") or die $DBI::errstr;
-my $counter=0;
+my $database = "DBI:Pg:dbname=sowpods";
+my $dbh      = DBI->connect("$database") or die $DBI::errstr;
+my $counter  = 0;
 
-open IN,"sowpods.txt";
-while(<IN>){
-	chomp;
-	my $word=lc($_);
-	my $query="SELECT new_word(\'$word\')";
-	my $sth = $dbh->prepare("$query");
-	$sth->execute;
-	$counter++;
+open IN, "sowpods.txt";
+while (<IN>) {
+    chomp;
+    my $word  = lc($_);
+    my $query = "SELECT new_word(\'$word\')";
+    my $sth   = $dbh->prepare("$query");
+    $sth->execute;
+    $counter++;
 }
 
 close IN;
