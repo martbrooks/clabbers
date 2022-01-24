@@ -250,37 +250,37 @@ CREATE INDEX idx_z_wordid ON z USING btree (wordid);
 CREATE INDEX idx_z_uid ON z USING btree (uid);
 
 CREATE FUNCTION new_word (varchar) RETURNS INTEGER AS $$
-	my $word=shift;
-        my %letters=();
-        my %wordhash=();
-        my $sorted="";
-	my $query="";
+        my $word     = shift;
+        my %letters  = ();
+        my %wordhash = ();
+        my $sorted   = "";
+        my $query    = "";
 
-        for (my $a=0; $a<length($word); $a++){
-                my $letter=substr($word,$a,1);
-                $letters{$letter}++;
-                $wordhash{$letter}++;
+        for ( my $a = 0 ; $a < length($word) ; $a++ ) {
+            my $letter = substr( $word, $a, 1 );
+            $letters{$letter}++;
+            $wordhash{$letter}++;
         }
-        foreach my $letter (sort keys %wordhash){
-                my $rep=$wordhash{$letter};
-                my $tmp=$letter x $rep;
-                $sorted=$sorted . $tmp;
+        foreach my $letter ( sort keys %wordhash ) {
+            my $rep = $wordhash{$letter};
+            my $tmp = $letter x $rep;
+            $sorted = $sorted . $tmp;
         }
 
-        $query="INSERT INTO words (word,hash,size) values (\'$word\',\'$sorted\',".length($word).")";
-	my $rv = spi_exec_query($query);
-	$query="SELECT uid FROM words WHERE word=\'$word\'";
-	$rv = spi_exec_query($query);
-	my $uid = $rv->{rows}[0]->{uid};
+        $query = "INSERT INTO words (word,hash,size) values (\'$word\',\'$sorted\'," . length($word) . ")";
+        my $rv = spi_exec_query($query);
+        $query = "SELECT uid FROM words WHERE word=\'$word\'";
+        $rv    = spi_exec_query($query);
+        my $uid = $rv->{rows}[0]->{uid};
 
-	my $len=length($word);
+        my $len = length($word);
 
-        foreach my $letter (sort keys %letters){
-                my $count=$letters{$letter};
-                my $query="INSERT INTO $letter (wordid,length,freq) VALUES ($uid,$len,$count)";
-		my $rv = spi_exec_query($query);
+        foreach my $letter ( sort keys %letters ) {
+            my $count = $letters{$letter};
+            my $query = "INSERT INTO $letter (wordid,length,freq) VALUES ($uid,$len,$count)";
+            my $rv    = spi_exec_query($query);
         }
-	return $result;
+        return $result;
 $$ LANGUAGE plperl;
 
 COMMIT;
